@@ -1,0 +1,28 @@
+{
+  "name": "scl-to-mermaid",
+  "version": "1.0.0",
+  "description": "",
+  "author": "Ryan Smith <rys@pobox.com>",
+  "license": "ISC",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "start": "microbundle watch",
+    "build": "microbundle",
+    "test": "jest --config=jest.json"
+  },
+  "dependencies": {
+    "@types/scl-parser": "file:../scl-parser-js",
+    "scl-parser": "file:../scl-parser-js"
+  },
+  "devDependencies": {
+    "@types/jest": "^22.1.0",
+    "jest": "^22.1.4",
+    "microbundle": "^0.6.0",
+    "ts-jest": "^22.0.1",
+    "typescript": "^2.6.2"
+  }
+}
