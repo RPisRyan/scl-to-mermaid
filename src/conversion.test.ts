@@ -17,8 +17,6 @@ import { SCLDocument, Concept } from 'scl-parser';
  
 //     end
 
-// expectDocConvertsToFlowchart(sclDoc: SCLDocument, )
-
 describe('toFlowchartModel', () => {
   test('converts concept', () => {
     const sclDoc: SCLDocument = {
