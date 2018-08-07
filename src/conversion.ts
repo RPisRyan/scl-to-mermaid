@@ -6,8 +6,8 @@ export function toFlowchartModel(sclDoc: SCLDocument): FlowchartNode {
   const conceptLookup = new Map<string, Concept>();
   const nodeLookup = new Map<string, FlowchartNode>();
   const root: FlowchartNode = {
-    id: sclDoc.name ? getNodeId(sclDoc.name) : 'root',
-    name: sclDoc.name || 'root',
+    id: sclDoc.title ? getNodeId(sclDoc.title) : 'root',
+    name: sclDoc.title || 'root',
     nodes: []
   };
   nodeLookup.set('root', root);
@@ -38,16 +38,18 @@ export function toFlowchartModel(sclDoc: SCLDocument): FlowchartNode {
       const parentId = getNodeId(concept.parent);
       let parentNode = nodeLookup.get(parentId);
 
-      if(!parentNode) {
+      if(parentNode){
+        parentNode.nodes = concat(parentNode.nodes, node);
+      } else {
         // synthesize parent
         parentNode = {
           id: parentId,
-          name: concept.parent.name,
+          name: concept.parent,
           nodes: [node]
         }
         nodeLookup.set(parentId, parentNode);
+        root.nodes = concat(root.nodes, parentNode);
       }
-      parentNode.nodes = concat(parentNode.nodes, node);
 
     } else {
       root.nodes = concat(root.nodes, node);
@@ -67,6 +69,7 @@ export function toFlowchartModel(sclDoc: SCLDocument): FlowchartNode {
               id: targetId,
               name: relation.target
             };
+            parent.nodes.push(targetNode);
             nodeLookup.set(targetId, targetNode);
           }
           const edge: FlowchartEdge = {
@@ -101,5 +104,5 @@ function getNodeId(name: string){
   if(!name){
     return Math.random().toString(36).substring(7);
   }
-  return name.replace(' ', '');
+  return name.replace(/ /g, '');
 }

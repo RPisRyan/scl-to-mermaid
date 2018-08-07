@@ -4,5 +4,6 @@
     "\\.ts$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
   },
   "testMatch": ["<rootDir>/src/**/*.test.ts"],
-  "testEnvironment": "node"
+  "testEnvironment": "node",
+  "verbose": true
 }
