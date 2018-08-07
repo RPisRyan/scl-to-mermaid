@@ -50,7 +50,7 @@ function serializeBlock(block: StructuredBlock, indentString: string): string[] 
 export function serialize(node: FlowchartNode): string {
   // const lookup = createNodeLookup(node);
   const rootBlock = nodeToBlock(node) as StructuredBlock;
-  return serializeBlock(rootBlock, '  ').join('\n');
+  return serializeBlock(rootBlock, '   ').join('\n');
 }
 
 function nodeToBlock(node: FlowchartNode, parent?: FlowchartNode): Block {

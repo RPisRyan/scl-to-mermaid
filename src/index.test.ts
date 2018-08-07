@@ -10,15 +10,15 @@ Time Travel
 `;
 
 const expected = `
-graph root
-  TimeTravel(Time Travel)
-  GettingShotByLibyans(Getting Shot By Libyans)
-  TimeTravel -- Can Prevent --> GettingShotByLibyans
+graph TB
+   TimeTravel(Time Travel)
+   GettingShotByLibyans(Getting Shot By Libyans)
+   FluxCapacitor -- Enables --> TimeTravel
+   TimeTravel -- Can Prevent --> GettingShotByLibyans
 
-  subgraph A DeLorean
-    FluxCapacitor(Flux Capacitor)
-    FluxCapacitor -- Enables --> TimeTravel
-  end
+   subgraph A DeLorean
+      FluxCapacitor(Flux Capacitor)
+   end
 `;
 
 describe('toFlowchart', () => {

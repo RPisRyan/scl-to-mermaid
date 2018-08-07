@@ -6,7 +6,7 @@ import { SCLDocument, Concept } from 'scl-parser';
 describe('toFlowchartModel', () => {
   test('converts concept', () => {
     const sclDoc: SCLDocument = {
-      title: 'DOC',
+      title: 'TB',
       concepts: [
         { name: 'C1' }
       ]
@@ -14,8 +14,8 @@ describe('toFlowchartModel', () => {
     const flowchart: FlowchartNode = toFlowchartModel(sclDoc);
 
     expect(flowchart).toEqual({
-      id: 'DOC',
-      name: 'DOC',
+      id: 'TB',
+      name: 'TB',
       nodes: [
         {
           id: 'C1',
@@ -27,7 +27,7 @@ describe('toFlowchartModel', () => {
 
   test('converts relation', () => {
     const sclDoc: SCLDocument = {
-      title: 'DOC',
+      title: 'TB',
       concepts: [
         { 
           name: 'C1', 
@@ -41,8 +41,8 @@ describe('toFlowchartModel', () => {
     const flowchart: FlowchartNode = toFlowchartModel(sclDoc);
 
     expect(flowchart).toEqual({
-      id: 'DOC',
-      name: 'DOC',
+      id: 'TB',
+      name: 'TB',
       nodes: [
         {
           id: 'C1',
@@ -65,7 +65,7 @@ describe('toFlowchartModel', () => {
 
   test('synthesizes relation target', () => {
     const sclDoc: SCLDocument = {
-      title: 'DOC',
+      title: 'TB',
       concepts: [
         { 
           name: 'C1', 
@@ -79,8 +79,8 @@ describe('toFlowchartModel', () => {
     const flowchart: FlowchartNode = toFlowchartModel(sclDoc);
 
     expect(flowchart).toEqual({
-      id: 'DOC',
-      name: 'DOC',
+      id: 'TB',
+      name: 'TB',
       nodes: [
         {
           id: 'C1',
@@ -103,7 +103,7 @@ describe('toFlowchartModel', () => {
 
   test('converts parent-child', () => {
     const sclDoc: SCLDocument = {
-      title: 'DOC',
+      title: 'TB',
       concepts: [
         {
           name: 'C1'
@@ -117,8 +117,8 @@ describe('toFlowchartModel', () => {
     const flowchart: FlowchartNode = toFlowchartModel(sclDoc);
 
     expect(flowchart).toEqual({
-      id: 'DOC',
-      name: 'DOC',
+      id: 'TB',
+      name: 'TB',
       nodes: [
         {
           id: 'C1',
@@ -137,7 +137,7 @@ describe('toFlowchartModel', () => {
 
   test('converts undeclared parent', () => {
     const sclDoc: SCLDocument = {
-      title: 'DOC',
+      title: 'TB',
       concepts: [
         { 
           name: 'C1.1',
@@ -148,8 +148,8 @@ describe('toFlowchartModel', () => {
     const flowchart: FlowchartNode = toFlowchartModel(sclDoc);
 
     expect(flowchart).toEqual({
-      id: 'DOC',
-      name: 'DOC',
+      id: 'TB',
+      name: 'TB',
       nodes: [
         {
           id: 'C1',

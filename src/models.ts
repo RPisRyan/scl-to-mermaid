@@ -18,6 +18,7 @@ export interface FlowchartNode {
   name: string;
   nodes?: FlowchartNode[];
   edges?: FlowchartEdge[];
+  parent?: FlowchartNode;
 }
 
 export interface ImageNode extends FlowchartNode {

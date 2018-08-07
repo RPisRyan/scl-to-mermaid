@@ -7,7 +7,7 @@ export function toFlowchartModel(sclDoc: SCLDocument): FlowchartNode {
   const nodeLookup = new Map<string, FlowchartNode>();
   const root: FlowchartNode = {
     id: sclDoc.title ? getNodeId(sclDoc.title) : 'root',
-    name: sclDoc.title || 'root',
+    name: 'TB',
     nodes: []
   };
   nodeLookup.set('root', root);
@@ -40,6 +40,7 @@ export function toFlowchartModel(sclDoc: SCLDocument): FlowchartNode {
 
       if(parentNode){
         parentNode.nodes = concat(parentNode.nodes, node);
+        node.parent = parentNode;
       } else {
         // synthesize parent
         parentNode = {
@@ -49,10 +50,12 @@ export function toFlowchartModel(sclDoc: SCLDocument): FlowchartNode {
         }
         nodeLookup.set(parentId, parentNode);
         root.nodes = concat(root.nodes, parentNode);
+        parentNode.parent = root;
       }
 
     } else {
       root.nodes = concat(root.nodes, node);
+      node.parent = root;
     }
 
   });
@@ -70,6 +73,7 @@ export function toFlowchartModel(sclDoc: SCLDocument): FlowchartNode {
               name: relation.target
             };
             parent.nodes.push(targetNode);
+            targetNode.parent = parent;
             nodeLookup.set(targetId, targetNode);
           }
           const edge: FlowchartEdge = {
@@ -81,8 +85,9 @@ export function toFlowchartModel(sclDoc: SCLDocument): FlowchartNode {
           if(!parent){
             throw new Error(`Cannot add edges because node ${node.id} does not have parent`);
           }
-
-          parent.edges = concat(parent.edges, edge);
+          
+          // add edge to parent of target, so target node does not get pulled into subgraph
+          targetNode.parent.edges = concat(targetNode.parent.edges, edge);
         });
       }
     }
@@ -93,7 +98,16 @@ export function toFlowchartModel(sclDoc: SCLDocument): FlowchartNode {
 
   buildNodeContent(root, undefined);
 
+  removeParentRefs(root);
+
   return root;
+}
+
+function removeParentRefs(node: FlowchartNode){
+  delete node.parent;
+  if(node.nodes){
+    node.nodes.forEach(removeParentRefs);
+  }
 }
 
 function concat<T>(array: T[] | undefined, item: T){
