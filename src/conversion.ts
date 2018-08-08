@@ -40,19 +40,18 @@ export function toFlowchartModel(sclDoc: SCLDocument): FlowchartNode {
 
       if(parentNode){
         parentNode.nodes = concat(parentNode.nodes, node);
-        node.parent = parentNode;
       } else {
         // synthesize parent
         parentNode = {
           id: parentId,
           name: concept.parent,
-          nodes: [node]
+          nodes: [node],
+          parent: root
         }
         nodeLookup.set(parentId, parentNode);
         root.nodes = concat(root.nodes, parentNode);
-        parentNode.parent = root;
       }
-
+      node.parent = parentNode;
     } else {
       root.nodes = concat(root.nodes, node);
       node.parent = root;
@@ -67,13 +66,14 @@ export function toFlowchartModel(sclDoc: SCLDocument): FlowchartNode {
         concept.relations.forEach((relation: Relation) => {
           const targetId = getNodeId(relation.target);
           let targetNode = nodeLookup.get(targetId);
-          if(!targetNode){
+          if(!targetNode) {
+            // synthesize target node
             targetNode = {
               id: targetId,
               name: relation.target
             };
-            parent.nodes.push(targetNode);
-            targetNode.parent = parent;
+            root.nodes.push(targetNode);
+            targetNode.parent = root;
             nodeLookup.set(targetId, targetNode);
           }
           const edge: FlowchartEdge = {
@@ -86,8 +86,7 @@ export function toFlowchartModel(sclDoc: SCLDocument): FlowchartNode {
             throw new Error(`Cannot add edges because node ${node.id} does not have parent`);
           }
           
-          // add edge to parent of target, so target node does not get pulled into subgraph
-          targetNode.parent.edges = concat(targetNode.parent.edges, edge);
+          root.edges = concat(root.edges, edge);
         });
       }
     }
