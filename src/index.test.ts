@@ -107,7 +107,26 @@ graph TB
 
     const flowchart = toFlowchart(scl);
     expect(flowchart.trim()).toEqual(expected.trim());
+  });
 
+  test('image concept with relation', () => {
+
+    const scl = `
+Brown Bear
+  image: https://i.imgur.com/XH8NDjz.jpg
+  width: 400
+  <Eats> Honey
+`;
+
+    const expected = `
+graph TB
+   BrownBear(<img src='https://i.imgur.com/XH8NDjz.jpg' alt='Brown Bear' width='400' />)
+   Honey(Honey)
+   BrownBear -- Eats --> Honey
+`;
+
+    const flowchart = toFlowchart(scl);
+    expect(flowchart.trim()).toEqual(expected.trim());
   });
 
 });

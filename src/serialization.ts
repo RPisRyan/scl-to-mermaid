@@ -1,19 +1,5 @@
 import { FlowchartNode } from "./models";
 
-// graph TB
-
-//     cat(<img src='https://i.imgur.com/dR11Api.jpg' width='400' />)
-//    cat -- Get message --> leadTime 
-
-//     subgraph NIKEiD Cloud
-//         leadTime(Lead Time Calculation) 
-//         libraryTraits(Library Traits)
-
-//         leadTime -- Get upper bound --> libraryTraits 
-//         leadTime -- Get translated message for LT ITEM --> libraryTraits 
- 
-//     end
-
 type Block = StructuredBlock | string;
 
 interface StructuredBlock {
@@ -55,6 +41,10 @@ export function serialize(node: FlowchartNode): string {
 
 function nodeToBlock(node: FlowchartNode, parent?: FlowchartNode): Block {
   const childNodes = node.nodes && [...node.nodes];
+
+  if(node.html){
+    return `${node.id}(${node.html})`;
+  }
 
   if(!childNodes){
     return `${node.id}(${node.name})`;

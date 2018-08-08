@@ -62,6 +62,21 @@ export function toFlowchartModel(sclDoc: SCLDocument): FlowchartNode {
   const buildNodeContent = (node: FlowchartNode, parent?: FlowchartNode) => {
     const concept = conceptLookup.get(node.id);
     if(concept){
+
+      if(concept.image){
+        const imageAttrs: [string, string][] = [];
+        imageAttrs.push(['src', concept.image]);
+        imageAttrs.push(['alt', concept.name]);
+        if(concept.width) {
+          imageAttrs.push(['width', concept.width]);
+        }
+        if(concept.height) {
+          imageAttrs.push(['height', concept.height]);
+        }
+        const attrString = imageAttrs.map(attr => `${attr[0]}='${attr[1]}'`).join(' ');
+        node.html = `<img ${attrString} />`;
+      }
+
       if(concept.relations){
         concept.relations.forEach((relation: Relation) => {
           const targetId = getNodeId(relation.target);

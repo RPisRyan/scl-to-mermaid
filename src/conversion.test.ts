@@ -22,7 +22,7 @@ describe('toFlowchartModel', () => {
           name: 'C1'
         }
       ]
-    })
+    });
   });
 
   test('converts relation', () => {
@@ -166,4 +166,40 @@ describe('toFlowchartModel', () => {
 
   });
 
+  test('converts image', () => {
+    expectConceptConvertsTo(
+      { 
+        name: 'Concept with image',
+        image: 'img/cat.jpg',
+        width: '400',
+        height: '300'
+      }, 
+      {
+        id: 'Conceptwithimage',
+        name: 'Concept with image',
+        html: `<img src='img/cat.jpg' alt='Concept with image' width='400' height='300' />`
+      }
+    );
+  });
+
 });
+
+function expectConceptConvertsTo(concept: Concept, expected: FlowchartNode){
+
+  const sclDoc: SCLDocument = {
+    title: 'TB',
+    concepts: [
+      concept
+    ]
+  };
+  const flowchart: FlowchartNode = toFlowchartModel(sclDoc);
+
+  expect(flowchart).toEqual({
+    id: 'TB',
+    name: 'TB',
+    nodes: [
+      expected
+    ]
+  });
+
+}

@@ -7,5 +7,6 @@ export * from './conversion';
 export function toFlowchart(scl: string): string {
   const sclDoc = parseDocument(scl);
   const flowchartModel = toFlowchartModel(sclDoc);
-  return serialize(flowchartModel);
+  const flowchart = serialize(flowchartModel);
+  return flowchart;
 }
