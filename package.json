@@ -1,6 +1,6 @@
 {
   "name": "scl-to-mermaid",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "Converts System Context Language to Mermaid flowchart format",
   "author": "Ryan Smith <rys@pobox.com>",
   "license": "ISC",
@@ -11,9 +11,9 @@
     "build": "microbundle",
     "test": "jest --config=jest.json"
   },
-  "repository" : "github:ryascl/scl-to-mermaid",
+  "repository": "github:ryascl/scl-to-mermaid",
   "dependencies": {
-    "scl-parser": "^0.3.2"
+    "scl-parser": "^0.4.1"
   },
   "devDependencies": {
     "@types/jest": "^22.1.0",
