@@ -1,34 +1,25 @@
-
-import { FlowchartNode, FlowchartEdge } from './models';
+import { FlowchartElement, FlowchartEdge, FlowchartDiagram } from './models';
 import { toFlowchartModel } from './conversion';
-import { SCLDocument, Concept } from 'scl-parser';
+import { Concept } from 'scl-parser';
 
 describe('toFlowchartModel', () => {
   test('converts concept', () => {
-    const sclDoc: SCLDocument = {
-      title: 'TB',
-      concepts: [
+    expectConvertResult(
+      [
         { name: 'C1' }
-      ]
-    }
-    const flowchart: FlowchartNode = toFlowchartModel(sclDoc);
-
-    expect(flowchart).toEqual({
-      id: 'TB',
-      name: 'TB',
-      nodes: [
+      ],
+      [
         {
           id: 'C1',
           name: 'C1'
         }
       ]
-    });
+    );
   });
 
   test('converts relation', () => {
-    const sclDoc: SCLDocument = {
-      title: 'TB',
-      concepts: [
+    expectConvertResult(
+      [
         { 
           name: 'C1', 
           relations: [
@@ -36,14 +27,8 @@ describe('toFlowchartModel', () => {
           ] 
         },
         { name: 'C2' }
-      ]
-    }
-    const flowchart: FlowchartNode = toFlowchartModel(sclDoc);
-
-    expect(flowchart).toEqual({
-      id: 'TB',
-      name: 'TB',
-      nodes: [
+      ],
+      [
         {
           id: 'C1',
           name: 'C1'
@@ -53,20 +38,19 @@ describe('toFlowchartModel', () => {
           name: 'C2'
         }
       ],
-      edges: [
+      [
         {
           sourceId: 'C1',
           targetId: 'C2',
           label: 'C1toC2'
         }
       ]
-    })
+    );
   });
 
   test('synthesizes relation target', () => {
-    const sclDoc: SCLDocument = {
-      title: 'TB',
-      concepts: [
+    expectConvertResult(
+      [
         { 
           name: 'C1', 
           relations: [
@@ -74,14 +58,8 @@ describe('toFlowchartModel', () => {
           ] 
         },
         // { name: 'C2' } this node should be synthesized
-      ]
-    }
-    const flowchart: FlowchartNode = toFlowchartModel(sclDoc);
-
-    expect(flowchart).toEqual({
-      id: 'TB',
-      name: 'TB',
-      nodes: [
+      ],
+      [
         {
           id: 'C1',
           name: 'C1'
@@ -91,20 +69,19 @@ describe('toFlowchartModel', () => {
           name: 'C2'
         }
       ],
-      edges: [
+      [
         {
           sourceId: 'C1',
           targetId: 'C2',
           label: 'C1toC2'
         }
       ]
-    })
+    );
   });
 
   test('converts parent-child', () => {
-    const sclDoc: SCLDocument = {
-      title: 'TB',
-      concepts: [
+    expectConvertResult(
+      [
         {
           name: 'C1'
         },
@@ -112,14 +89,8 @@ describe('toFlowchartModel', () => {
           name: 'C1.1',
           parent: 'C1'
         }
-      ]
-    };
-    const flowchart: FlowchartNode = toFlowchartModel(sclDoc);
-
-    expect(flowchart).toEqual({
-      id: 'TB',
-      name: 'TB',
-      nodes: [
+      ],
+      [
         {
           id: 'C1',
           name: 'C1',
@@ -130,27 +101,17 @@ describe('toFlowchartModel', () => {
             }
           ]
         }
-      ]
-    });
-
+      ],
+    );
   });
 
   test('converts undeclared parent', () => {
-    const sclDoc: SCLDocument = {
-      title: 'TB',
-      concepts: [
-        { 
-          name: 'C1.1',
-          parent: 'C1'
-        }
-      ]
-    };
-    const flowchart: FlowchartNode = toFlowchartModel(sclDoc);
-
-    expect(flowchart).toEqual({
-      id: 'TB',
-      name: 'TB',
-      nodes: [
+    expectConvertResult(
+      { 
+        name: 'C1.1',
+        parent: 'C1'
+      },
+      [
         {
           id: 'C1',
           name: 'C1',
@@ -161,45 +122,37 @@ describe('toFlowchartModel', () => {
             }
           ]
         }
-      ]
-    });
-
+      ],
+    );
   });
 
   test('converts image', () => {
-    expectConceptConvertsTo(
+    expectConvertResult(
       { 
         name: 'Concept with image',
         image: 'img/cat.jpg',
         width: '400',
         height: '300'
       }, 
-      {
-        id: 'Conceptwithimage',
-        name: 'Concept with image',
-        html: `<img src='img/cat.jpg' alt='Concept with image' width='400' height='300' />`
-      }
+      [
+        {
+          id: 'Conceptwithimage',
+          name: 'Concept with image',
+          html: `<img src='img/cat.jpg' alt='Concept with image' width='400' height='300' />`
+        }
+      ]
     );
   });
 
 });
 
-function expectConceptConvertsTo(concept: Concept, expected: FlowchartNode){
-
-  const sclDoc: SCLDocument = {
-    title: 'TB',
-    concepts: [
-      concept
-    ]
-  };
-  const flowchart: FlowchartNode = toFlowchartModel(sclDoc);
-
-  expect(flowchart).toEqual({
-    id: 'TB',
-    name: 'TB',
-    nodes: [
-      expected
-    ]
+function expectConvertResult(conceptsInput: Concept | Concept[], 
+  expectedElements: FlowchartElement[], 
+  expectedEdges?: FlowchartEdge[]){
+  const concepts: Concept[] = conceptsInput instanceof Array ? conceptsInput : [ conceptsInput ];
+  const flowchart: FlowchartDiagram = toFlowchartModel({
+    concepts
   });
-
+  expect(flowchart.nodes).toEqual(expectedElements);
+  expect(flowchart.edges).toEqual(expectedEdges || []);
 }

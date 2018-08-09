@@ -1,16 +1,17 @@
 
-import { FlowchartNode, FlowchartEdge } from './models';
+import { FlowchartElement, FlowchartEdge, FlowchartDiagram, FlowchartNode } from './models';
 import { SCLDocument, Concept, Relation, parseDocument } from 'scl-parser';
 
-export function toFlowchartModel(sclDoc: SCLDocument): FlowchartNode {
+export function toFlowchartModel(sclDoc: SCLDocument): FlowchartDiagram {
   const conceptLookup = new Map<string, Concept>();
-  const nodeLookup = new Map<string, FlowchartNode>();
-  const root: FlowchartNode = {
-    id: sclDoc.title ? getNodeId(sclDoc.title) : 'root',
-    name: 'TB',
-    nodes: []
+  const nodeLookup = new Map<string, FlowchartElement>();
+  const root: FlowchartDiagram = {
+    graphType: 'TB',
+    nodes: [],
+    edges: [],
+    styleStatements: []
   };
-  nodeLookup.set('root', root);
+
   // created nodes
   sclDoc.concepts.forEach((concept: Concept) => {
     const id = getNodeId(concept.name);
@@ -24,11 +25,6 @@ export function toFlowchartModel(sclDoc: SCLDocument): FlowchartNode {
 
   // build tree by adding node to declared parent
   Array.from(nodeLookup.values()).forEach((node) => {
-    if(node === root){
-      // root will not have parent
-      return;
-    }
-
     const concept = conceptLookup.get(node.id);
     if(!concept){
       throw new Error(`Could not find concept for ${JSON.stringify(node)}`);
@@ -59,8 +55,8 @@ export function toFlowchartModel(sclDoc: SCLDocument): FlowchartNode {
 
   });
   
-  const buildNodeContent = (node: FlowchartNode, parent?: FlowchartNode) => {
-    const concept = conceptLookup.get(node.id);
+  const buildNodeContent = (element: FlowchartElement, parent?: FlowchartNode) => {
+    const concept = conceptLookup.get(element.id);
     if(concept){
 
       if(concept.image){
@@ -74,7 +70,11 @@ export function toFlowchartModel(sclDoc: SCLDocument): FlowchartNode {
           imageAttrs.push(['height', concept.height]);
         }
         const attrString = imageAttrs.map(attr => `${attr[0]}='${attr[1]}'`).join(' ');
-        node.html = `<img ${attrString} />`;
+        element.html = `<img ${attrString} />`;
+        if(root.styleStatements.length === 0){
+          root.styleStatements.push('classDef inlineImage fill:none,stroke:none');
+        }
+        root.styleStatements.push(`class ${element.id} inlineImage`);
       }
 
       if(concept.relations){
@@ -92,25 +92,30 @@ export function toFlowchartModel(sclDoc: SCLDocument): FlowchartNode {
             nodeLookup.set(targetId, targetNode);
           }
           const edge: FlowchartEdge = {
-            sourceId: node.id,
+            sourceId: element.id,
             targetId: targetId,
             label: relation.label
           };
 
           if(!parent){
-            throw new Error(`Cannot add edges because node ${node.id} does not have parent`);
+            throw new Error(`Cannot add edges because node ${element.id} does not have parent`);
           }
           
           root.edges = concat(root.edges, edge);
         });
       }
     }
-    if(node.nodes) {
-      node.nodes.forEach(child => buildNodeContent(child, node));
-    }
+
+    buildNodeChildren(element);
   };
 
-  buildNodeContent(root, undefined);
+  const buildNodeChildren = (container: FlowchartNode, parent?: FlowchartNode) => {
+    if(container.nodes) {
+      container.nodes.forEach(child => buildNodeContent(child, container));
+    }
+  }
+
+  buildNodeChildren(root);
 
   removeParentRefs(root);
 
@@ -118,7 +123,9 @@ export function toFlowchartModel(sclDoc: SCLDocument): FlowchartNode {
 }
 
 function removeParentRefs(node: FlowchartNode){
-  delete node.parent;
+  if((node as FlowchartElement).parent) {
+    delete (node as FlowchartElement).parent;
+  }
   if(node.nodes){
     node.nodes.forEach(removeParentRefs);
   }

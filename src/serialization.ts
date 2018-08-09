@@ -1,4 +1,4 @@
-import { FlowchartNode } from "./models";
+import { FlowchartElement, FlowchartDiagram, FlowchartNode } from "./models";
 
 type Block = StructuredBlock | string;
 
@@ -33,21 +33,24 @@ function serializeBlock(block: StructuredBlock, indentString: string): string[] 
   return lines;
 }
 
-export function serialize(node: FlowchartNode): string {
-  // const lookup = createNodeLookup(node);
-  const rootBlock = nodeToBlock(node) as StructuredBlock;
-  return serializeBlock(rootBlock, '   ').join('\n');
+export function serialize(flowchart: FlowchartDiagram): string {
+  const diagramBlock = nodeToBlock(flowchart) as StructuredBlock;
+  return serializeBlock(diagramBlock, '   ').join('\n');
 }
 
 function nodeToBlock(node: FlowchartNode, parent?: FlowchartNode): Block {
   const childNodes = node.nodes && [...node.nodes];
 
-  if(node.html){
-    return `${node.id}(${node.html})`;
+  const asElement = node as FlowchartElement;
+  const asDiagram = node as FlowchartDiagram;
+  const isDiagramNode = Boolean(asDiagram.graphType);
+  
+  if(asElement.html){
+    return `${asElement.id}(${asElement.html})`;
   }
 
   if(!childNodes){
-    return `${node.id}(${node.name})`;
+    return `${asElement.id}(${asElement.name})`;
   }
 
   childNodes.sort(c => c.nodes && c.nodes.length > 0 ? 1 : 0);
@@ -59,10 +62,10 @@ function nodeToBlock(node: FlowchartNode, parent?: FlowchartNode): Block {
   };
 
   if(parent) {
-    block.pre.push(`subgraph ${node.name}`);
+    block.pre.push(`subgraph ${asElement.name}`);
     block.post.push(`end`);
   } else {
-    block.pre.push(`graph ${node.name}`);
+    block.pre.push(`graph ${asDiagram.graphType}`);
   }
 
   const structuredChildren = [];
@@ -90,6 +93,10 @@ function nodeToBlock(node: FlowchartNode, parent?: FlowchartNode): Block {
 
   // structured children at end of main
   block.main = block.main.concat(structuredChildren);
+
+  if(isDiagramNode){
+    block.main = block.main.concat(asDiagram.styleStatements);
+  }
 
   return block;  
 }

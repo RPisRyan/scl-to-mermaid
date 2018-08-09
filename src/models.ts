@@ -1,23 +1,18 @@
-// graph TB
 
-//     cat(<img src='https://i.imgur.com/dR11Api.jpg' width='400' />)
-//    cat -- Get message --> leadTime 
 
-//     subgraph NIKEiD Cloud
-//         leadTime(Lead Time Calculation) 
-//         libraryTraits(Library Traits)
-
-//         leadTime -- Get upper bound --> libraryTraits 
-//         leadTime -- Get translated message for LT ITEM --> libraryTraits 
- 
-//     end
-
+export interface FlowchartDiagram extends FlowchartNode {
+  graphType: 'TB' | 'LR';
+  styleStatements: string[];
+}
 
 export interface FlowchartNode {
+  nodes?: FlowchartElement[];
+  edges?: FlowchartEdge[];
+}
+
+export interface FlowchartElement extends FlowchartNode {
   id: string;
   name: string;
-  nodes?: FlowchartNode[];
-  edges?: FlowchartEdge[];
   parent?: FlowchartNode;
   html?: string;
 }

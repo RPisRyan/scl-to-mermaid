@@ -123,6 +123,8 @@ graph TB
    BrownBear(<img src='https://i.imgur.com/XH8NDjz.jpg' alt='Brown Bear' width='400' />)
    Honey(Honey)
    BrownBear -- Eats --> Honey
+   classDef inlineImage fill:none,stroke:none
+   class BrownBear inlineImage
 `;
 
     const flowchart = toFlowchart(scl);
